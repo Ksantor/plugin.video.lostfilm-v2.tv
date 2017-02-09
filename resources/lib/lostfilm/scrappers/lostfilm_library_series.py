@@ -7,30 +7,32 @@ import CommonFunctions
 from common.network_request import NetworkRequest
 from lostfilm.models.serie import Serie
 
-class LostfilmSeries(object):
+class LostfilmLibrarySeries(object):
   def __init__(self):
     self.network_request = NetworkRequest()
     self.parsedom = CommonFunctions
 
   def list(self):
-    response = self.network_request.get(self.network_request.base_url + '/my/type_1')
-    rows = self.serial_rows(response.text)
     series_list_items = []
 
-    for row in rows:
-      title_en, title_ru = self.serie_titles(row)
-      total_episodes_count, watched_episodes_count = self.series_episode_count(row)
+    url = self.network_request.base_url + '/my/type_1'
+    response = self.network_request.get(url)
+    series = self.serial_rows(response.text)
 
-      series_data = [
-        self.serie_id(row),
-        self.serie_code(row),
+    for serie in series:
+      title_en, title_ru = self.serie_titles(serie)
+      total_episodes_count, watched_episodes_count = self.series_episode_count(serie)
+
+      serie_data = [
+        self.serie_id(serie),
+        self.serie_code(serie),
         title_en,
         title_ru,
         total_episodes_count,
         watched_episodes_count
       ]
 
-      series_list_items.append(Serie(*series_data).item())
+      series_list_items.append(Serie(*serie_data).item())
 
     return series_list_items
 

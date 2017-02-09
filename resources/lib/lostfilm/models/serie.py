@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from common.plugin import plugin
 from collections import namedtuple
+from common.plugin import plugin
+from common.helpers import poster, fanart_image
 from common.helpers import color
 
 class Serie(namedtuple('Serie', ['id', 'code', 'title_en', 'title_ru', 'total_episodes', 'watched_episodes'])):
   def item(self):
     return {
       'label': self.title,
-      'path': self.series_url,
+      'path': self.serie_url,
       'is_playable': False,
-      'thumbnail': self.poster,
+      'thumbnail': poster(self.id),
       'properties': {
-          'fanart_image': self.fanart_image,
+          'fanart_image': fanart_image(self.id),
       },
       'info': {
           'title': self.title,
@@ -31,16 +32,6 @@ class Serie(namedtuple('Serie', ['id', 'code', 'title_en', 'title_ru', 'total_ep
       'context_menu': self.context_menu
     }
 
-  def episodes_list_item(self):
-    return {
-      'label': self.title,
-      'path': self.series_url,
-      'is_playable': False,
-      'properties': {
-          'fanart_image': self.fanart_image,
-      }
-    }
-
   @property
   def context_menu(self):
     return [self.info_menu]
@@ -50,16 +41,8 @@ class Serie(namedtuple('Serie', ['id', 'code', 'title_en', 'title_ru', 'total_ep
     return (plugin.get_string(40306), "Action(Info)")
 
   @property
-  def series_url(self):
-    return None
-
-  @property
-  def poster(self):
-    return 'http://static.lostfilm.tv/Images/%s/Posters/shmoster_s1.jpg' % self.id
-
-  @property
-  def fanart_image(self):
-    return 'http://static.lostfilm.tv/Images/%s/Posters/poster.jpg' % self.id
+  def serie_url(self):
+    return plugin.url_for('serie_episodes', serie_id = self.id, serie_code = self.code)
 
   @property
   def title(self):
@@ -76,3 +59,4 @@ class Serie(namedtuple('Serie', ['id', 'code', 'title_en', 'title_ru', 'total_ep
       return ''
 
     return ' (%s)' % color(int(self.total_episodes) - int(self.watched_episodes), 'lime')
+
